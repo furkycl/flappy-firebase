@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, type Firestore } from 'firebase/firestore'
+import { getFirestore, initializeFirestore, type Firestore } from 'firebase/firestore'
 import type { Analytics } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -24,7 +24,12 @@ let app: FirebaseApp | undefined
 let db: Firestore | undefined
 if (isConfigValid) {
   app = initializeApp(firebaseConfig)
-  db = getFirestore(app)
+  // Vercel gibi bazı ortamlar WebChannel'ı engelleyebilir.
+  // Long-polling'i otomatik tespit ederek ağ sorunlarını azaltalım.
+  db = initializeFirestore(app, {
+    experimentalAutoDetectLongPolling: true,
+    useFetchStreams: false,
+  })
 }
 export { app, db }
 
