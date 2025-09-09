@@ -44,6 +44,8 @@ canvas{
   display:block;
   border-radius:8px;
   background: linear-gradient(180deg,#70c5ce,#dff9ff);
+  /* Mobile: ön tanımlı jestleri engelle (double-tap zoom vs.) */
+  touch-action: none;
 }
 .hud{
   display:flex;
@@ -66,4 +68,3 @@ canvas{
 .muted{opacity:.7}
 .row{display:flex;gap:8px}
 input[type="text"]{flex:1;padding:8px 10px;border-radius:8px;border:1px solid #ccc}
-

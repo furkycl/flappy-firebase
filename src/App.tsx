@@ -24,6 +24,11 @@ export default function App() {
 
     const canvas = canvasRef.current!
     const ctx = canvas.getContext('2d')!
+    // Mobile: yüksek DPI için ölçekleme, mantıksal boyut sabit kalır
+    const dpr = Math.min(2, window.devicePixelRatio || 1)
+    canvas.width = CANVAS_W * dpr
+    canvas.height = CANVAS_H * dpr
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     const engine = new FlappyEngine(ctx, { width: CANVAS_W, height: CANVAS_H })
     engineRef.current = engine
 
@@ -36,7 +41,15 @@ export default function App() {
     let raf = requestAnimationFrame(sync)
 
     const onClick = () => engine.flap()
+    const isTypingActive = () => {
+      const ae = document.activeElement as HTMLElement | null
+      if (!ae) return false
+      const tag = ae.tagName.toLowerCase()
+      return ae.isContentEditable || tag === 'input' || tag === 'textarea' || tag === 'select'
+    }
     const onKey = (e: KeyboardEvent) => {
+      // İsim alanında yazarken klavye kısayollarını devre dışı bırak
+      if (isTypingActive()) return
       if (e.code === 'Space' || e.code === 'ArrowUp' || e.code === 'KeyW') {
         e.preventDefault()
         engine.flap()
