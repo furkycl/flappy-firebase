@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
-import { getFirestore, initializeFirestore, type Firestore } from 'firebase/firestore'
+import { getFirestore, initializeFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore'
 import type { Analytics } from 'firebase/analytics'
 
 const firebaseConfig = {
@@ -22,6 +22,7 @@ const isConfigValid = !!(
 
 let app: FirebaseApp | undefined
 let db: Firestore | undefined
+export const USE_FIREBASE_EMULATORS = (import.meta as any)?.env?.VITE_FIREBASE_EMULATORS === '1'
 if (isConfigValid) {
   app = initializeApp(firebaseConfig)
   // Vercel gibi bazı ortamlar WebChannel'ı engelleyebilir.
@@ -29,6 +30,15 @@ if (isConfigValid) {
   db = initializeFirestore(app, {
     experimentalAutoDetectLongPolling: true,
   })
+  if (USE_FIREBASE_EMULATORS) {
+    try {
+      connectFirestoreEmulator(db, '127.0.0.1', 8080)
+      // getFirestore(app) yerine initializeFirestore kullandığımız için
+      // mevcut db örneğine bağlanmak yeterli.
+    } catch (e) {
+      console.warn('Firestore emulator bağlanamadı:', e)
+    }
+  }
 }
 export { app, db }
 
