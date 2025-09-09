@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FlappyEngine, type GameState } from './game/engine'
-import { saveScore, getLeaderboard, type WindowKey, type LeaderboardResult } from './services/leaderboard'
+import { saveScore, getLeaderboard, hasSavedScore, type WindowKey, type LeaderboardResult } from './services/leaderboard'
 import { ensureAuth } from './services/auth'
 
 const CANVAS_W = 420
@@ -16,6 +16,7 @@ export default function App() {
   const [lb, setLb] = useState<LeaderboardResult | null>(null)
   const [saving, setSaving] = useState(false)
   const [loadingLB, setLoadingLB] = useState(false)
+  const [hasSaved, setHasSaved] = useState(false)
 
   useEffect(() => {
     // Anonymous auth'ı önden başlat (kurallara göre yazma yetkisi için)
@@ -51,6 +52,9 @@ export default function App() {
     // draw initial ready screen
     engine.restart()
 
+    // Kullanıcının daha önce skor kaydedip kaydetmediğini kontrol et
+    hasSavedScore().then(setHasSaved).catch(() => setHasSaved(false))
+
     return () => {
       cancelAnimationFrame(raf)
       engine.destroy()
@@ -62,7 +66,7 @@ export default function App() {
   const start = () => engineRef.current?.start()
   const restart = () => engineRef.current?.restart()
 
-  const disabledSubmit = playerName.trim().length < 2 || state !== 'gameover' || saving
+  const disabledSubmit = playerName.trim().length < 2 || state !== 'gameover' || saving || hasSaved || score <= 10
 
   const refreshLB = async (win: WindowKey = lbWindow) => {
     setLoadingLB(true)
@@ -118,6 +122,7 @@ export default function App() {
                 await saveScore(playerName.trim(), s.score)
                 await refreshLB()
                 alert('Skor kaydedildi!')
+                setHasSaved(true)
               } catch (e: any) {
                 alert(e?.message ?? 'Skor kaydedilemedi')
               } finally {
@@ -128,7 +133,7 @@ export default function App() {
             </button>
           </div>
           <div className="muted" style={{ marginTop: 6 }}>
-            Boşluk / Yukarı / Tıkla: zıpla • R/Enter: yeniden
+            Boşluk / Yukarı / Tıkla: zıpla • R/Enter: yeniden • Min skor: 11
           </div>
 
           <div style={{ marginTop: 12 }}>

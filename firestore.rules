@@ -5,32 +5,20 @@ service cloud.firestore {
       return n is string && n.size() > 0 && n.size() <= 24;
     }
     function isValidScore(s) {
-      return s is number && s >= 0 && s <= 5000 && s == int(s);
-    }
-    // 10 saniye rate-limit ve ts tutarlılığı
-    function canSubmit(uid) {
-      let userDoc = get(/databases/$(database)/documents/users/$(uid));
-      // kullanıcı yoksa ilk kayda izin ver
-      return !(userDoc.exists()) || (request.time - userDoc.data.lastScoreTs > duration.value(10, 's'));
+      // 11 ve üzeri skorlara izin ver
+      return s is number && s >= 11 && s <= 5000 && s == int(s);
     }
 
-    match /scores/{id} {
-      allow read: if true; // herkese açık okuma
+    // Her kullanıcı yalnızca bir kez skor kaydedebilir: /scores/{uid}
+    match /scores/{uid} {
+      allow read: if true;
       allow create: if request.auth != null
-        && request.resource.data.uid == request.auth.uid
+        && request.auth.uid == uid
         && isValidName(request.resource.data.name)
         && isValidScore(request.resource.data.score)
-        && request.resource.data.ts is timestamp // serverTimestamp transform
-        && canSubmit(request.auth.uid);
+        && request.resource.data.ts is timestamp
+        && !exists(/databases/$(database)/documents/scores/$(uid));
       allow update, delete: if false;
-    }
-
-    match /users/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      // yalnızca kendi kaydını güncelleyebilir; serverTimestamp transform kabul
-      allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.lastScoreTs is timestamp;
-      allow delete: if false;
     }
   }
 }

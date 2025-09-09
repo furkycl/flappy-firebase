@@ -1,6 +1,6 @@
 import { db } from './firebase'
-import { addDoc, collection, getDocs, limit, orderBy, query, where, serverTimestamp, Timestamp, writeBatch, doc, setDoc } from 'firebase/firestore'
-import { ensureAuth, currentUid } from './auth'
+import { collection, getDocs, limit, orderBy, query, where, serverTimestamp, Timestamp, doc, setDoc, getDoc } from 'firebase/firestore'
+import { ensureAuth } from './auth'
 
 export type WindowKey = '1h' | '24h' | '30d'
 
@@ -31,26 +31,22 @@ export async function saveScore(name: string, score: number): Promise<void> {
   const cleanName = name.trim().slice(0, 24)
   if (!cleanName) throw new Error('İsim gerekli')
   if (!Number.isFinite(score) || score < 0) throw new Error('Skor geçersiz')
+  if (score <= 10) throw new Error('Minimum skor 11 olmalı')
 
   const user = await ensureAuth()
   const uid = user.uid
 
-  const batch = writeBatch(db)
-  const scoresCol = collection(db, 'scores')
-  const usersDoc = doc(db, 'users', uid)
-  const scoreDoc = doc(scoresCol) // otomatik id
+  // Kullanıcı başına tek kayıt: /scores/{uid}
+  const scoreRef = doc(db, 'scores', uid)
+  const exists = await getDoc(scoreRef)
+  if (exists.exists()) throw new Error('Bu kullanıcı zaten skor kaydetti')
 
-  batch.set(scoreDoc, {
+  await setDoc(scoreRef, {
     uid,
     name: cleanName,
     score,
     ts: serverTimestamp(),
   })
-  batch.set(usersDoc, {
-    lastScoreTs: serverTimestamp(),
-  }, { merge: true })
-
-  await batch.commit()
 }
 
 export async function getLeaderboard(win: WindowKey, topN = 50): Promise<LeaderboardResult> {
@@ -75,4 +71,13 @@ export async function getLeaderboard(win: WindowKey, topN = 50): Promise<Leaderb
   })
   items.sort((a, b) => b.score - a.score || b.ts - a.ts)
   return { window: win, entries: items.slice(0, topN) }
+}
+
+export async function hasSavedScore(): Promise<boolean> {
+  if (!db) return false
+  const user = await ensureAuth().catch(() => null)
+  if (!user) return false
+  const ref = doc(db, 'scores', user.uid)
+  const snap = await getDoc(ref)
+  return snap.exists()
 }
