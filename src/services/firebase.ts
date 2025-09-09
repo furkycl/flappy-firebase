@@ -28,7 +28,6 @@ if (isConfigValid) {
   // Long-polling'i otomatik tespit ederek ağ sorunlarını azaltalım.
   db = initializeFirestore(app, {
     experimentalAutoDetectLongPolling: true,
-    useFetchStreams: false,
   })
 }
 export { app, db }
