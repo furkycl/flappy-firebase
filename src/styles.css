@@ -1,0 +1,69 @@
+:root{
+  color-scheme: light dark;
+}
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  background: linear-gradient(180deg,#87CEEB,#e0f6ff);
+  color:#111;
+}
+.page{
+  display:grid;
+  grid-template-rows:auto 1fr auto;
+  min-height:100%;
+}
+header,footer{
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+header h1{
+  margin:0;
+  font-size:18px;
+}
+.container{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+.card{
+  width: 420px;
+  max-width: 100%;
+  background: rgba(255,255,255,.8);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  padding: 12px;
+}
+canvas{
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:8px;
+  background: linear-gradient(180deg,#70c5ce,#dff9ff);
+}
+.hud{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin:8px 0 0;
+}
+.btn{
+  background:#111;
+  color:#fff;
+  padding:8px 12px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.score{
+  font-weight:700;
+}
+.muted{opacity:.7}
+.row{display:flex;gap:8px}
+input[type="text"]{flex:1;padding:8px 10px;border-radius:8px;border:1px solid #ccc}
+
