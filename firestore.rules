@@ -7,11 +7,6 @@ service cloud.firestore {
     function isValidScore(s) {
       return s is number && s >= 3 && s <= 5000 && s == int(s);
     }
-    function canSubmit(uid) {
-      let userDoc = get(/databases/$(database)/documents/users/$(uid));
-      return !(userDoc.exists()) || !(userDoc.data.lastScoreTs is timestamp) ||
-             (request.time - userDoc.data.lastScoreTs > duration.value(10, 's'));
-    }
 
     match /scores/{id} {
       allow read: if true;
@@ -19,15 +14,13 @@ service cloud.firestore {
         && request.resource.data.uid == request.auth.uid
         && isValidName(request.resource.data.name)
         && isValidScore(request.resource.data.score)
-        && request.resource.data.ts is timestamp
-        && canSubmit(request.auth.uid);
+        && request.resource.data.ts is timestamp;
       allow update, delete: if false;
     }
 
     match /users/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null && request.auth.uid == uid
-        && request.resource.data.lastScoreTs is timestamp;
+      allow create, update: if request.auth != null && request.auth.uid == uid;
       allow delete: if false;
     }
   }
