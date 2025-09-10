@@ -1,6 +1,8 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app'
 import { getFirestore, initializeFirestore, connectFirestoreEmulator, type Firestore } from 'firebase/firestore'
 import type { Analytics } from 'firebase/analytics'
+// App Check (opsiyonel)
+let appCheckInited = false
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY as string,
@@ -52,4 +54,20 @@ export const analytics = (async (): Promise<Analytics | undefined> => {
   } catch {
     return undefined
   }
+})()
+
+// Opsiyonel: App Check (reCAPTCHA v3). Firestore için enforcement açıksa gereklidir.
+// VITE_RECAPTCHA_SITE_KEY tanımlıysa etkinleştirir.
+void (async () => {
+  if (!app || typeof window === 'undefined') return
+  const key = (import.meta as any)?.env?.VITE_RECAPTCHA_SITE_KEY as string | undefined
+  if (!key || appCheckInited) return
+  try {
+    const { initializeAppCheck, ReCaptchaV3Provider } = await import('firebase/app-check')
+    initializeAppCheck(app, {
+      provider: new ReCaptchaV3Provider(key),
+      isTokenAutoRefreshEnabled: true,
+    })
+    appCheckInited = true
+  } catch {}
 })()

@@ -2,7 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function isValidName(n) {
-      return n is string && n.size() > 0 && n.size() <= 24;
+      // Boş olmayan ve makul uzunlukta isim (emoji vb. için toleranslı)
+      return n is string && n.matches(".*\\S.*") && n.size() <= 40;
     }
     function isValidScore(s) {
       // 3 ve üzeri skorlara izin ver
@@ -11,7 +12,9 @@ service cloud.firestore {
     // 10 saniye rate-limit
     function canSubmit(uid) {
       let userDoc = get(/databases/$(database)/documents/users/$(uid));
-      return !(userDoc.exists()) || (request.time - userDoc.data.lastScoreTs > duration.value(10, 's'));
+      // Doküman yoksa izin ver. Alan yoksa da izin ver. Alan varsa 10sn kontrolü yap.
+      return !(userDoc.exists()) || !(userDoc.data.lastScoreTs is timestamp) ||
+             (request.time - userDoc.data.lastScoreTs > duration.value(10, 's'));
     }
 
     match /scores/{id} {
