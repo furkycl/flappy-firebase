@@ -29,8 +29,9 @@ const FORCE_LONG_POLLING = (import.meta as any)?.env?.VITE_FIRESTORE_FORCE_LONG_
 if (isConfigValid) {
   app = initializeApp(firebaseConfig)
   // Vercel/proxy ortamlarında WebChannel sorunlarına karşı long-polling.
-  const settings: any = { experimentalAutoDetectLongPolling: true }
-  if (FORCE_LONG_POLLING) settings.experimentalForceLongPolling = true
+  const settings: any = FORCE_LONG_POLLING
+    ? { experimentalForceLongPolling: true }
+    : { experimentalAutoDetectLongPolling: true }
   db = initializeFirestore(app, settings)
   if (USE_FIREBASE_EMULATORS) {
     try {
