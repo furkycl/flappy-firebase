@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FlappyEngine, type GameState } from './game/engine'
-import { saveScore, getLeaderboard, hasSavedScore, type WindowKey, type LeaderboardResult } from './services/leaderboard'
+import { saveScore, getLeaderboard, type WindowKey, type LeaderboardResult } from './services/leaderboard'
 import { ensureAuth } from './services/auth'
 
 const CANVAS_W = 420
@@ -55,7 +55,7 @@ export default function App() {
         engine.flap()
       } else if (e.code === 'KeyR' || e.code === 'Enter') {
         if (engine.getSnapshot().state === 'gameover') {
-          engine.restart()
+          restart()
         }
       }
     }
@@ -65,9 +65,6 @@ export default function App() {
     // draw initial ready screen
     engine.restart()
 
-    // Kullanıcının daha önce skor kaydedip kaydetmediğini kontrol et
-    hasSavedScore().then(setHasSaved).catch(() => setHasSaved(false))
-
     return () => {
       cancelAnimationFrame(raf)
       engine.destroy()
@@ -76,8 +73,8 @@ export default function App() {
     }
   }, [])
 
-  const start = () => engineRef.current?.start()
-  const restart = () => engineRef.current?.restart()
+  const start = () => { setHasSaved(false); engineRef.current?.start() }
+  const restart = () => { setHasSaved(false); engineRef.current?.restart() }
 
   const nameOk = playerName.trim().length >= 1
   const canSaveNow = state === 'gameover' && nameOk && !saving && !hasSaved && score > 2
@@ -87,7 +84,7 @@ export default function App() {
     : state !== 'gameover'
     ? 'Oyun bittikten sonra kaydedebilirsin'
     : hasSaved
-    ? 'Bu kullanıcıyla zaten kaydettin'
+    ? 'Bu oyunda zaten kaydettin'
     : score <= 2
     ? 'Minimum skor 3'
     : saving

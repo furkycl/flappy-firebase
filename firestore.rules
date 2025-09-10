@@ -8,17 +8,28 @@ service cloud.firestore {
       // 3 ve üzeri skorlara izin ver
       return s is number && s >= 3 && s <= 5000 && s == int(s);
     }
+    // 10 saniye rate-limit
+    function canSubmit(uid) {
+      let userDoc = get(/databases/$(database)/documents/users/$(uid));
+      return !(userDoc.exists()) || (request.time - userDoc.data.lastScoreTs > duration.value(10, 's'));
+    }
 
-    // Her kullanıcı yalnızca bir kez skor kaydedebilir: /scores/{uid}
-    match /scores/{uid} {
+    match /scores/{id} {
       allow read: if true;
       allow create: if request.auth != null
-        && request.auth.uid == uid
+        && request.resource.data.uid == request.auth.uid
         && isValidName(request.resource.data.name)
         && isValidScore(request.resource.data.score)
         && request.resource.data.ts is timestamp
-        && !exists(/databases/$(database)/documents/scores/$(uid));
+        && canSubmit(request.auth.uid);
       allow update, delete: if false;
+    }
+
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.lastScoreTs is timestamp;
+      allow delete: if false;
     }
   }
 }

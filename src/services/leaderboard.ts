@@ -1,5 +1,5 @@
 import { db } from './firebase'
-import { collection, getDocs, limit, orderBy, query, where, serverTimestamp, Timestamp, doc, setDoc, getDoc } from 'firebase/firestore'
+import { collection, getDocs, limit, orderBy, query, where, serverTimestamp, Timestamp, doc, setDoc, writeBatch, addDoc } from 'firebase/firestore'
 import { ensureAuth } from './auth'
 
 export type WindowKey = '1h' | '24h' | '30d'
@@ -36,17 +36,23 @@ export async function saveScore(name: string, score: number): Promise<void> {
   const user = await ensureAuth()
   const uid = user.uid
 
-  // Kullanıcı başına tek kayıt: /scores/{uid}
-  const scoreRef = doc(db, 'scores', uid)
-  const exists = await getDoc(scoreRef)
-  if (exists.exists()) throw new Error('Bu kullanıcı zaten skor kaydetti')
+  // Çoklu kayıt: /scores (random id) + /users/{uid}.lastScoreTs (rate-limit için)
+  const batch = writeBatch(db)
+  const scoresCol = collection(db, 'scores')
+  const scoreDoc = doc(scoresCol)
+  const usersDoc = doc(db, 'users', uid)
 
-  await setDoc(scoreRef, {
+  batch.set(scoreDoc, {
     uid,
     name: cleanName,
     score,
     ts: serverTimestamp(),
   })
+  batch.set(usersDoc, {
+    lastScoreTs: serverTimestamp(),
+  }, { merge: true })
+
+  await batch.commit()
 }
 
 export async function getLeaderboard(win: WindowKey, topN = 50): Promise<LeaderboardResult> {
@@ -73,11 +79,4 @@ export async function getLeaderboard(win: WindowKey, topN = 50): Promise<Leaderb
   return { window: win, entries: items.slice(0, topN) }
 }
 
-export async function hasSavedScore(): Promise<boolean> {
-  if (!db) return false
-  const user = await ensureAuth().catch(() => null)
-  if (!user) return false
-  const ref = doc(db, 'scores', user.uid)
-  const snap = await getDoc(ref)
-  return snap.exists()
-}
+// hasSavedScore kaldırıldı: her oyundan sonra bir kayda izin veriliyor (UI bazlı kilit)
