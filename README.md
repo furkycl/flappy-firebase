@@ -1,85 +1,29 @@
-# Pro Flappy Bird (TS + React)
+# Pro Flappy Bird
 
-Basit ve hatasız bir başlangıç sürümü. Oyun canvas üzerinde çalışır, React arayüzü skor ve kontrol akışını sunar. Firebase liderlik tablosu entegrasyonu sonraki adımda eklenecek.
+Hedef basit: Ekrana dokunup/tuşlara basıp kuşu engellerin arasından geçirerek en yüksek skoru yapmak.
 
-## Kurulum
+## Nasıl Oynanır
 
-1. Node.js 18+ önerilir.
-2. Bağımlılıklar:
+- Zıplama: Boşluk, Yukarı, W veya ekrana dokun/tıkla.
+- Yeniden başlat: Oyun bittiğinde R veya Enter.
+- Amaç: Borular arasındaki boşluklardan geçerek puan topla. Zemine veya borulara değersen oyun biter.
 
-```
-npm install
-```
+## Skor Kaydetme ve Liderlik
 
-3. Geliştirme sunucusu:
+- Oyun bittiğinde ismini yazıp “Skoru Kaydet”e bas.
+- Minimum skor: 3. Her oyun için 1 kere kaydedebilirsin (kısa aralıkta tekrar kayda izin yok).
+- Liderlik tablosu: Son 1 saat, 24 saat ve 1 ay pencerelerine göre en yüksek skorlar listelenir.
 
-```
-npm run dev
-```
+## Mobil Deneyim
 
-Tarayıcıda `http://localhost:5173` adresine gidin.
+- Dokunma ile zıplama, yüksek DPI’larda net görüntü ve küçük ekranlara uygun düzen.
+- Çentikli ekranlar için güvenli alanlar gözetilir.
 
-## Kontroller
+## Neler Yaptık (Özet)
 
-- Boşluk / Yukarı / Tıkla: zıpla
-- R / Enter: oyun bitince yeniden başlat
+- Canvas tabanlı oyun motoru (fizik, çarpışma, skor, oyun durumu).
+- Firebase ile skor kaydı ve zaman pencereli liderlik tablosu.
+- Basit hile önleme: anonim oturum, minimum skor, isim sınırı ve kısa aralıkta tekrar kayda karşı oran sınırlama.
+- Mobil uyum: Daha büyük dokunma hedefleri, yüksek DPI ölçekleme, responsive düzen.
 
-## Yapı
-
-- `src/game/engine.ts`: Oyun fiziği ve çizim döngüsü
-- `src/App.tsx`: React arayüzü ve oyun kontrolü
-- `src/services/leaderboard.ts`: Firebase entegrasyon kancaları (placeholder)
-
-## Planlanan Firebase Entegrasyonu
-
-Artık eklendi. Aşağıdaki adımları izleyin.
-
-### Firebase Kurulum
-
-1. Firebase Console’da bir Web App oluşturun ve Firestore etkinleştirin.
-2. `./.env` dosyası oluşturup `.env.example` içeriğini doldurun:
-
-```
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-VITE_FIREBASE_MEASUREMENT_ID=...
-```
-
-3. Bağımlılıkları kurun ve çalıştırın:
-
-```
-npm install
-npm run dev
-```
-
-### Firestore Yapısı
-
-- Koleksiyon: `scores`
-- Alanlar: `uid` (string), `name` (string), `score` (number), `ts` (timestamp - server time)
-- Koleksiyon: `users/{uid}` -> `lastScoreTs` (timestamp)
-
-### Güvenlik (öneri)
-
-Üretime daha yakın kurallar repo’daki `firestore.rules` dosyasındadır. Özellikler:
-- Anonymous Auth zorunlu (yazmak için)
-- İsim/Skor validasyonu, skor üst sınırı (5000), ts = server time
-- 10 saniyede bir yazma sınırı (per user)
-
-Yükleme talimatı (Firebase CLI):
-```
-firebase deploy --only firestore:rules
-```
-
-### Sorgular ve Sıralama
-
-- Uygulama `ts >= cutoff` (timestamp) filtresi ile son pencereyi alır, sonuçları client tarafında skora göre sıralar ve ilk 50’yi gösterir.
-
-## Sonraki Adımlar
-
-- Firebase konfigürasyonu (`.env`, `firebaseConfig` ve güvenlik kuralları)
-- Skor kaydı ve listeleme arayüzü
-- Mobil dokunma optimizasyonları ve ses efektleri (opsiyonel)
+Keyifli oyunlar!
