@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#70c5ce"/>
+      <stop offset="100%" stop-color="#dff9ff"/>
+    </linearGradient>
+    <linearGradient id="bird" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f7d046"/>
+      <stop offset="100%" stop-color="#f1b80f"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="url(#sky)"/>
+  <!-- Bird body -->
+  <g transform="translate(20,22)">
+    <circle cx="14" cy="12" r="12" fill="url(#bird)" />
+    <!-- Wing -->
+    <path d="M8 12c0-4 6-6 10-3 3 2 2 6-2 7-4 1-8 0-8-4z" fill="#e8a90a" />
+    <!-- Eye -->
+    <circle cx="18" cy="10" r="2.4" fill="#fff"/>
+    <circle cx="19" cy="10" r="1.1" fill="#111"/>
+    <!-- Beak -->
+    <path d="M26 12l6 3-6 3z" fill="#e67e22"/>
+  </g>
+</svg>
+
