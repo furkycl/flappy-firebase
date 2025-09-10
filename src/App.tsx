@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { FlappyEngine, type GameState } from './game/engine'
 import { saveScore, getLeaderboard, type WindowKey, type LeaderboardResult } from './services/leaderboard'
-import { ensureAuth } from './services/auth'
+import { ensureAuth, checkAuth } from './services/auth'
 
 const CANVAS_W = 420
 const CANVAS_H = 640
@@ -17,6 +17,7 @@ export default function App() {
   const [saving, setSaving] = useState(false)
   const [loadingLB, setLoadingLB] = useState(false)
   const [hasSaved, setHasSaved] = useState(false)
+  const [authInfo, setAuthInfo] = useState<{ok:boolean; uid?: string; error?: string}>({ ok: false })
 
   useEffect(() => {
     // Anonymous auth'ı önden başlat (kurallara göre yazma yetkisi için)
@@ -73,6 +74,15 @@ export default function App() {
     }
   }, [])
 
+  useEffect(() => {
+    // Auth durumunu başta ve görünürlük değişince kontrol et
+    const run = () => { checkAuth().then(setAuthInfo).catch(()=> setAuthInfo({ok:false,error:'auth-failed'})) }
+    run()
+    const vis = () => { if (document.visibilityState === 'visible') run() }
+    document.addEventListener('visibilitychange', vis)
+    return () => document.removeEventListener('visibilitychange', vis)
+  }, [])
+
   const start = () => { setHasSaved(false); engineRef.current?.start() }
   const restart = () => { setHasSaved(false); engineRef.current?.restart() }
 
@@ -109,7 +119,9 @@ export default function App() {
     <div className="page">
       <header>
         <h1>Pro Flappy Bird</h1>
-        <div className="muted">TS + React, basit sürüm</div>
+        <div className="muted" title={authInfo.ok ? `Anon UID: ${authInfo.uid}` : `Auth hata: ${authInfo.error || ''}`}>
+          Auth: {authInfo.ok ? 'OK' : 'HATA'}
+        </div>
       </header>
       <div className="container">
         <div className="card">
@@ -147,7 +159,10 @@ export default function App() {
                 alert('Skor kaydedildi!')
                 setHasSaved(true)
               } catch (e: any) {
-                alert(e?.message ?? 'Skor kaydedilemedi')
+                const msg = e?.code === 'permission-denied'
+                  ? 'Yetki hatası: Authorized Domains ve Anonymous Auth ayarlarını kontrol edin.'
+                  : (e?.message ?? 'Skor kaydedilemedi')
+                alert(msg)
               } finally {
                 setSaving(false)
               }

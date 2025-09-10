@@ -29,3 +29,12 @@ export function ensureAuth(): Promise<User> {
 export function currentUid(): string | null {
   return cachedUser?.uid ?? null
 }
+
+export async function checkAuth(): Promise<{ ok: boolean; uid?: string; error?: string }>{
+  try {
+    const u = await ensureAuth()
+    return { ok: true, uid: u.uid }
+  } catch (e: any) {
+    return { ok: false, error: e?.code || e?.message || 'auth-failed' }
+  }
+}
