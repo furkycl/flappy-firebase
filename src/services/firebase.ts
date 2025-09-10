@@ -25,13 +25,13 @@ const isConfigValid = !!(
 let app: FirebaseApp | undefined
 let db: Firestore | undefined
 export const USE_FIREBASE_EMULATORS = (import.meta as any)?.env?.VITE_FIREBASE_EMULATORS === '1'
+const FORCE_LONG_POLLING = (import.meta as any)?.env?.VITE_FIRESTORE_FORCE_LONG_POLLING === '1'
 if (isConfigValid) {
   app = initializeApp(firebaseConfig)
-  // Vercel gibi bazı ortamlar WebChannel'ı engelleyebilir.
-  // Long-polling'i otomatik tespit ederek ağ sorunlarını azaltalım.
-  db = initializeFirestore(app, {
-    experimentalAutoDetectLongPolling: true,
-  })
+  // Vercel/proxy ortamlarında WebChannel sorunlarına karşı long-polling.
+  const settings: any = { experimentalAutoDetectLongPolling: true }
+  if (FORCE_LONG_POLLING) settings.experimentalForceLongPolling = true
+  db = initializeFirestore(app, settings)
   if (USE_FIREBASE_EMULATORS) {
     try {
       connectFirestoreEmulator(db, '127.0.0.1', 8080)
