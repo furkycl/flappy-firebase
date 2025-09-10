@@ -79,7 +79,20 @@ export default function App() {
   const start = () => engineRef.current?.start()
   const restart = () => engineRef.current?.restart()
 
-  const disabledSubmit = playerName.trim().length < 2 || state !== 'gameover' || saving || hasSaved || score <= 10
+  const nameOk = playerName.trim().length >= 1
+  const canSaveNow = state === 'gameover' && nameOk && !saving && !hasSaved && score > 10
+  const disabledSubmit = !canSaveNow
+  const disabledReason = !nameOk
+    ? 'İsim en az 1 karakter olmalı'
+    : state !== 'gameover'
+    ? 'Oyun bittikten sonra kaydedebilirsin'
+    : hasSaved
+    ? 'Bu kullanıcıyla zaten kaydettin'
+    : score <= 10
+    ? 'Minimum skor 11'
+    : saving
+    ? 'Kaydediliyor...'
+    : ''
 
   const refreshLB = async (win: WindowKey = lbWindow) => {
     setLoadingLB(true)
@@ -147,6 +160,9 @@ export default function App() {
           </div>
           <div className="muted" style={{ marginTop: 6 }}>
             Boşluk / Yukarı / Tıkla: zıpla • R/Enter: yeniden • Min skor: 11
+            {disabledSubmit && (
+              <div className="muted" style={{marginTop:4}}>{disabledReason}</div>
+            )}
           </div>
 
           <div style={{ marginTop: 12 }}>
