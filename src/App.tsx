@@ -18,6 +18,7 @@ export default function App() {
   const [loadingLB, setLoadingLB] = useState(false)
   const [hasSaved, setHasSaved] = useState(false)
   const [authInfo, setAuthInfo] = useState<{ok:boolean; uid?: string; error?: string}>({ ok: false })
+  const isProd = (import.meta as any)?.env?.PROD === true || (import.meta as any)?.env?.MODE === 'production'
 
   useEffect(() => {
     // Anonymous auth'ı önden başlat (kurallara göre yazma yetkisi için)
@@ -119,9 +120,11 @@ export default function App() {
     <div className="page">
       <header>
         <h1>Pro Flappy Bird</h1>
-        <div className="muted" title={authInfo.ok ? `Anon UID: ${authInfo.uid}` : `Auth hata: ${authInfo.error || ''}`}>
-          Auth: {authInfo.ok ? 'OK' : 'HATA'}
-        </div>
+        {!isProd && (
+          <div className="muted" title={authInfo.ok ? `Anon UID: ${authInfo.uid}` : `Auth hata: ${authInfo.error || ''}`}>
+            Auth: {authInfo.ok ? 'OK' : 'HATA'}
+          </div>
+        )}
       </header>
       <div className="container">
         <div className="card">
