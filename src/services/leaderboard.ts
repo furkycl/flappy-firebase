@@ -28,7 +28,7 @@ function windowToMs(win: WindowKey): number {
 
 export async function saveScore(name: string, score: number): Promise<void> {
   if (!db) throw new Error('Firebase yapılandırması eksik')
-  const cleanName = name.trim().slice(0, 24)
+  const cleanName = name.trim().slice(0, 40)
   if (!cleanName) throw new Error('İsim gerekli')
   if (!Number.isFinite(score) || score < 0) throw new Error('Skor geçersiz')
   if (score <= 2) throw new Error('Minimum skor 3 olmalı')

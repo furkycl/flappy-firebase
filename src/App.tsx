@@ -86,7 +86,7 @@ export default function App() {
   const start = () => { setHasSaved(false); engineRef.current?.start() }
   const restart = () => { setHasSaved(false); engineRef.current?.restart() }
 
-  const nameOk = playerName.trim().length >= 1
+  const nameOk = /\S/.test(playerName) && playerName.trim().length <= 40
   const canSaveNow = state === 'gameover' && nameOk && !saving && !hasSaved && score > 2
   const disabledSubmit = !canSaveNow
   const disabledReason = !nameOk
@@ -159,8 +159,10 @@ export default function App() {
                 alert('Skor kaydedildi!')
                 setHasSaved(true)
               } catch (e: any) {
-                const msg = e?.code === 'permission-denied'
-                  ? 'Yetki hatası: Authorized Domains ve Anonymous Auth ayarlarını kontrol edin.'
+                console.error('saveScore error:', e)
+                const code = e?.code || ''
+                const msg = code === 'permission-denied'
+                  ? 'Yetki hatası (permission-denied). Domain/Auth kuralları veya Firestore kuralları engelledi. Konsolda ayrıntılar mevcut.'
                   : (e?.message ?? 'Skor kaydedilemedi')
                 alert(msg)
               } finally {
