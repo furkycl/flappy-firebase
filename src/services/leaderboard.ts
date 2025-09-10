@@ -31,7 +31,7 @@ export async function saveScore(name: string, score: number): Promise<void> {
   const cleanName = name.trim().slice(0, 24)
   if (!cleanName) throw new Error('İsim gerekli')
   if (!Number.isFinite(score) || score < 0) throw new Error('Skor geçersiz')
-  if (score <= 10) throw new Error('Minimum skor 11 olmalı')
+  if (score <= 2) throw new Error('Minimum skor 3 olmalı')
 
   const user = await ensureAuth()
   const uid = user.uid

@@ -80,7 +80,7 @@ export default function App() {
   const restart = () => engineRef.current?.restart()
 
   const nameOk = playerName.trim().length >= 1
-  const canSaveNow = state === 'gameover' && nameOk && !saving && !hasSaved && score > 10
+  const canSaveNow = state === 'gameover' && nameOk && !saving && !hasSaved && score > 2
   const disabledSubmit = !canSaveNow
   const disabledReason = !nameOk
     ? 'İsim en az 1 karakter olmalı'
@@ -88,8 +88,8 @@ export default function App() {
     ? 'Oyun bittikten sonra kaydedebilirsin'
     : hasSaved
     ? 'Bu kullanıcıyla zaten kaydettin'
-    : score <= 10
-    ? 'Minimum skor 11'
+    : score <= 2
+    ? 'Minimum skor 3'
     : saving
     ? 'Kaydediliyor...'
     : ''
@@ -159,7 +159,7 @@ export default function App() {
             </button>
           </div>
           <div className="muted" style={{ marginTop: 6 }}>
-            Boşluk / Yukarı / Tıkla: zıpla • R/Enter: yeniden • Min skor: 11
+            Boşluk / Yukarı / Tıkla: zıpla • R/Enter: yeniden • Min skor: 3
             {disabledSubmit && (
               <div className="muted" style={{marginTop:4}}>{disabledReason}</div>
             )}

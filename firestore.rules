@@ -5,8 +5,8 @@ service cloud.firestore {
       return n is string && n.size() > 0 && n.size() <= 24;
     }
     function isValidScore(s) {
-      // 11 ve üzeri skorlara izin ver
-      return s is number && s >= 11 && s <= 5000 && s == int(s);
+      // 3 ve üzeri skorlara izin ver
+      return s is number && s >= 3 && s <= 5000 && s == int(s);
     }
 
     // Her kullanıcı yalnızca bir kez skor kaydedebilir: /scores/{uid}
