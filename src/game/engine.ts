@@ -218,6 +218,15 @@ export class FlappyEngine {
     ctx.lineTo(this.bird.r, 4)
     ctx.closePath()
     ctx.fill()
+    // eye (white + pupil)
+    ctx.fillStyle = '#fff'
+    ctx.beginPath()
+    ctx.arc(this.bird.r * 0.25, -4, 3.6, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = '#111'
+    ctx.beginPath()
+    ctx.arc(this.bird.r * 0.25 + 1, -4, 1.6, 0, Math.PI * 2)
+    ctx.fill()
     ctx.restore()
 
     // UI overlays
@@ -249,4 +258,3 @@ export class FlappyEngine {
     }
   }
 }
-
