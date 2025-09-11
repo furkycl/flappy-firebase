@@ -27,3 +27,15 @@ Hedef basit: Ekrana dokunup/tuşlara basıp kuşu engellerin arasından geçirer
 - Mobil uyum: Daha büyük dokunma hedefleri, yüksek DPI ölçekleme, responsive düzen.
 
 Keyifli oyunlar!
+
+## Güvenlik ve Spam Önleme (Özet)
+
+- API Key: Web API key’i prod domain(ler)iniz için HTTP referrers ile sınırlandırın.
+- Authorized Domains: Prod/custom domain(lerin)izi Authentication → Settings’te ekleyin.
+- Firestore Kuralları: Minimum skor, isim uzunluğu/boşluk kontrolü ve sunucu zaman damgası (repo içindeki rules dosyası) aktif.
+
+## Custom Domain ve Bağış
+
+- Vercel → Project → Domains: kendi domaininizi bağlayın (ör. oyun.sizindomain.com).
+- Firebase Authorized Domains ve API key referrers’e domaininizi ekleyin.
+- Bağış/IBAN: Arayüze basit bir bağış bölümü eklenebilir (isteğe bağlı).

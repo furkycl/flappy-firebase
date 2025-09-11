@@ -1,8 +1,6 @@
 import { db } from './firebase'
 import { collection, getDocs, limit, orderBy, query, where, serverTimestamp, Timestamp, doc, setDoc, writeBatch, addDoc } from 'firebase/firestore'
 import { ensureAuth } from './auth'
-import { getFunctions, httpsCallable } from 'firebase/functions'
-import { app } from './firebase'
 
 export type WindowKey = '1h' | '24h' | '30d'
 
@@ -28,8 +26,6 @@ function windowToMs(win: WindowKey): number {
   }
 }
 
-const USE_FUNCTIONS = (import.meta as any)?.env?.VITE_USE_FUNCTIONS === '1'
-
 export async function saveScore(name: string, score: number): Promise<void> {
   if (!db) throw new Error('Firebase yapılandırması eksik')
   const cleanName = name.trim().slice(0, 40)
@@ -40,16 +36,7 @@ export async function saveScore(name: string, score: number): Promise<void> {
   const user = await ensureAuth()
   const uid = user.uid
 
-  if (USE_FUNCTIONS) {
-    const region = ((import.meta as any)?.env?.VITE_FUNCTIONS_REGION as string) || 'europe-west3'
-    const fns = getFunctions(app!, region)
-    const call = httpsCallable(fns, 'submitScore')
-    const res: any = await call({ name: cleanName, score })
-    if (!res?.data?.ok) throw new Error('Fonksiyon başarısız')
-    return
-  }
-
-  // Doğrudan Firestore yolu (App Check enforcement yokken)
+  // Doğrudan Firestore yazımı
   const batch = writeBatch(db)
   const scoresCol = collection(db, 'scores')
   const scoreDoc = doc(scoresCol)
