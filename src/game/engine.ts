@@ -240,11 +240,11 @@ export class FlappyEngine {
     if (this.state === 'ready') {
       ctx.fillStyle = '#000'
       ctx.globalAlpha = 0.75
-      ctx.fillRect(w * 0.15, h * 0.3, w * 0.7, 100)
+      ctx.fillRect(w * 0.15, h * 0.3, w * 0.7, 110)
       ctx.globalAlpha = 1
       ctx.fillStyle = '#fff'
-      ctx.font = 'bold 22px system-ui, sans-serif'
-      ctx.fillText('Başlamak için tıkla veya boşluk', w / 2, h * 0.3 + 40)
+      ctx.font = 'bold 26px system-ui, sans-serif'
+      ctx.fillText('Başlamak için tıkla veya boşluk', w / 2, h * 0.3 + 52)
     } else if (this.state === 'gameover') {
       ctx.fillStyle = '#000'
       ctx.globalAlpha = 0.75
