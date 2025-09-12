@@ -238,13 +238,23 @@ export class FlappyEngine {
     ctx.globalAlpha = 1
 
     if (this.state === 'ready') {
+      // Draw a backdrop sized to the text width so it never looks cramped
+      const message = 'Başlamak için tıkla veya boşluk'
+      ctx.font = 'bold 26px system-ui, sans-serif'
+      const textW = ctx.measureText(message).width
+      const paddingX = 28
+      const bgW = Math.max(w * 0.7, textW + paddingX * 2)
+      const bgH = 110
+      const bgX = (w - bgW) / 2
+      const bgY = h * 0.3
+
       ctx.fillStyle = '#000'
       ctx.globalAlpha = 0.75
-      ctx.fillRect(w * 0.15, h * 0.3, w * 0.7, 110)
+      ctx.fillRect(bgX, bgY, bgW, bgH)
       ctx.globalAlpha = 1
+
       ctx.fillStyle = '#fff'
-      ctx.font = 'bold 26px system-ui, sans-serif'
-      ctx.fillText('Başlamak için tıkla veya boşluk', w / 2, h * 0.3 + 52)
+      ctx.fillText(message, w / 2, bgY + 52)
     } else if (this.state === 'gameover') {
       ctx.fillStyle = '#000'
       ctx.globalAlpha = 0.75
